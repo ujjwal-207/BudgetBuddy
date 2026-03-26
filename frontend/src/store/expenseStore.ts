@@ -1,0 +1,403 @@
+import { create } from 'zustand';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+export interface Expense {
+  id: number;
+  amount: number;
+  account_id?: number | null;
+  account_name?: string | null;
+  account_icon?: string | null;
+  category_id: number;
+  category_name: string;
+  category_icon: string;
+  category_color: string;
+  description: string | null;
+  item_name: string | null;
+  item_type: string | null;
+  is_need: boolean | null;
+  longevity: string | null;
+  mood: string | null;
+  quality_score: number;
+  is_impulse: boolean;
+  date: string;
+  payment_method: string | null;
+  created_at: string;
+}
+
+export interface Income {
+  id: number;
+  amount: number;
+  account_id?: number | null;
+  source: string;
+  category: string | null;
+  description: string | null;
+  date: string;
+  allocation_month: string;
+  is_regular: boolean;
+  created_at: string;
+}
+
+export interface Investment {
+  id: number;
+  name: string;
+  type: string | null;
+  invested_amount: number;
+  current_value: number | null;
+  units: number | null;
+  buy_price: number | null;
+  current_price: number | null;
+  profit_loss: number;
+  return_percentage: number;
+  purchase_date: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface Transfer {
+  id: number;
+  from_account: string;
+  to_account: string;
+  from_account_id?: number | null;
+  to_account_id?: number | null;
+  amount: number;
+  description: string | null;
+  transfer_type: string | null;
+  investment_id: number | null;
+  transfer_date: string;
+  effective_month: string;
+  created_at: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  icon: string;
+  color: string;
+  monthly_budget: number;
+  spent_this_month?: number;
+}
+
+export interface Account {
+  id: number;
+  name: string;
+  type: string;
+  account_role: string;
+  icon: string | null;
+  color: string | null;
+  current_balance: number;
+  created_at: string;
+}
+
+export interface DashboardData {
+  category_summary: any[];
+  daily_spending: any[];
+  total_spent: number;
+  total_budget: number;
+  days_left: number;
+  budget_percentage: number;
+  top_keywords: any[];
+  cashflow_summary?: {
+    total_income: number;
+    total_invested: number;
+    total_withdrawn: number;
+    available_budget: number;
+    remaining_budget: number;
+  };
+}
+
+export interface Insight {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
+  emoji: string;
+  data?: any;
+}
+
+interface ExpenseState {
+  expenses: Expense[];
+  categories: Category[];
+  accounts: Account[];
+  income: Income[];
+  investments: Investment[];
+  transfers: Transfer[];
+  dashboard: DashboardData | null;
+  insights: Insight[];
+  loading: boolean;
+  error: string | null;
+  
+  // Expense Actions
+  fetchExpenses: (filters?: { month?: string; category?: string }) => Promise<void>;
+  addExpense: (expense: Partial<Expense> & { natural_input?: string }) => Promise<Expense>;
+  updateExpense: (id: number, expense: Partial<Expense>) => Promise<void>;
+  deleteExpense: (id: number) => Promise<void>;
+  
+  // Income Actions
+  fetchIncome: (month?: string) => Promise<void>;
+  addIncome: (income: Partial<Income>) => Promise<Income>;
+  deleteIncome: (id: number) => Promise<void>;
+  
+  // Investment Actions
+  fetchInvestments: () => Promise<void>;
+  addInvestment: (investment: Partial<Investment>) => Promise<Investment>;
+  updateInvestment: (id: number, investment: Partial<Investment>) => Promise<void>;
+  deleteInvestment: (id: number) => Promise<void>;
+  addInvestmentTransaction: (investmentId: number, transaction: any) => Promise<void>;
+  
+  // Transfer Actions
+  fetchTransfers: (month?: string) => Promise<void>;
+  addTransfer: (transfer: Partial<Transfer>) => Promise<Transfer>;
+  
+  // Common Actions
+  fetchCategories: (month?: string) => Promise<void>;
+  fetchAccounts: () => Promise<void>;
+  fetchDashboard: () => Promise<void>;
+  fetchInsights: () => Promise<void>;
+  clearError: () => void;
+}
+
+export const useExpenseStore = create<ExpenseState>((set, get) => ({
+  expenses: [],
+  categories: [],
+  accounts: [],
+  income: [],
+  investments: [],
+  transfers: [],
+  dashboard: null,
+  insights: [],
+  loading: false,
+  error: null,
+
+  fetchExpenses: async (filters) => {
+    set({ loading: true, error: null });
+    try {
+      const params = new URLSearchParams();
+      if (filters?.month) params.append('month', filters.month);
+      if (filters?.category) params.append('category', filters.category);
+      
+      const response = await axios.get(`${API_URL}/expenses?${params}`);
+      set({ expenses: response.data, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  addExpense: async (expense) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/expenses`, expense);
+      set((state) => ({ 
+        expenses: [response.data, ...state.expenses],
+        loading: false 
+      }));
+      get().fetchDashboard();
+      get().fetchAccounts();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  updateExpense: async (id, expense) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.patch(`${API_URL}/expenses/${id}`, expense);
+      set((state) => ({
+        expenses: state.expenses.map((e) => (e.id === id ? response.data : e)),
+        loading: false
+      }));
+      get().fetchDashboard();
+      get().fetchAccounts();
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  deleteExpense: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await axios.delete(`${API_URL}/expenses/${id}`);
+      set((state) => ({
+        expenses: state.expenses.filter((e) => e.id !== id),
+        loading: false
+      }));
+      get().fetchDashboard();
+      get().fetchAccounts();
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchCategories: async (month) => {
+    try {
+      const params = month ? `?month=${encodeURIComponent(month)}` : '';
+      const response = await axios.get(`${API_URL}/categories${params}`);
+      set({ categories: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  fetchAccounts: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/accounts`);
+      set({ accounts: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  fetchDashboard: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/dashboard`);
+      set({ dashboard: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  fetchInsights: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/insights/weekly`);
+      set({ insights: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  // Income Actions
+  fetchIncome: async (month) => {
+    try {
+      const params = month ? `?month=${encodeURIComponent(month)}` : '';
+      const response = await axios.get(`${API_URL}/income${params}`);
+      set({ income: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  addIncome: async (income) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/income`, income);
+      set((state) => ({
+        income: [response.data, ...state.income],
+        loading: false
+      }));
+      get().fetchDashboard();
+      get().fetchAccounts();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  deleteIncome: async (id) => {
+    try {
+      await axios.delete(`${API_URL}/income/${id}`);
+      set((state) => ({
+        income: state.income.filter((i) => i.id !== id)
+      }));
+      get().fetchAccounts();
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  // Investment Actions
+  fetchInvestments: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/investments`);
+      set({ investments: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  addInvestment: async (investment) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/investments`, investment);
+      set((state) => ({
+        investments: [response.data, ...state.investments],
+        loading: false
+      }));
+      get().fetchDashboard();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  updateInvestment: async (id, investment) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.put(`${API_URL}/investments/${id}`, investment);
+      set((state) => ({
+        investments: state.investments.map((i) => (i.id === id ? response.data : i)),
+        loading: false
+      }));
+      get().fetchDashboard();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  deleteInvestment: async (id) => {
+    try {
+      await axios.delete(`${API_URL}/investments/${id}`);
+      set((state) => ({
+        investments: state.investments.filter((i) => i.id !== id)
+      }));
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  addInvestmentTransaction: async (investmentId, transaction) => {
+    try {
+      await axios.post(`${API_URL}/investments/${investmentId}/transaction`, transaction);
+      get().fetchInvestments();
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  // Transfer Actions
+  fetchTransfers: async (month) => {
+    try {
+      const params = month ? `?month=${encodeURIComponent(month)}` : '';
+      const response = await axios.get(`${API_URL}/transfers${params}`);
+      set({ transfers: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  addTransfer: async (transfer) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/transfers`, transfer);
+      set((state) => ({
+        transfers: [response.data, ...state.transfers],
+        loading: false
+      }));
+      get().fetchInvestments();
+      get().fetchDashboard();
+      get().fetchAccounts();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  clearError: () => set({ error: null }),
+}));
