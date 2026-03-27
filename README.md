@@ -120,7 +120,7 @@ Frontend runs on `http://localhost:3000`
 ## 🚢 Deployment tips
 
 - **Backend**: point `DATABASE_URL` to your managed Postgres (Railway, Supabase, etc.). The app already reads `DATABASE_URL`, `PGHOST`, `PGUSER`, and the other standard Postgres env vars, so just configure them in your cloud provider before starting the Docker image or Node process.
-- **Frontend**: when building for production, set `VITE_API_URL` to the deployed backend URL (for example `https://alluring-renewal-production-df8c.up.railway.app`). When you run `npm run build`, Vite will bake that address into the static assets while local development continues to talk to `http://localhost:4000`.
+- **Frontend**: when building for production, set `VITE_API_URL` to the deployed backend URL (for example `https://alluring-renewal-production-df8c.up.railway.app`). When you run `npm run build`, Vite will bake that address into the static assets while local development continues to talk to `http://localhost:4000`. If you need the dev server to accept traffic proxied from another hostname (a tunnel URL or preview host), set `VITE_ALLOWED_HOSTS` to a comma-separated list of hostnames so Vite’s dev server allows those requests.
 - **Local vs deployed**: keep using `./start-app.sh` for localhost (it already defaults the frontend to `http://localhost:4000`). In deployment environments use the same repo, but override `VITE_API_URL` and `DATABASE_URL` so the services target the hosted backend and database.
 
 ## 📚 API Endpoints
