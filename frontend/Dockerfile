@@ -1,15 +1,22 @@
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-ENV NODE_ENV=development
-ENV NPM_CONFIG_OMIT=
-
 COPY frontend/package*.json ./
-RUN npm install --include=dev
+RUN npm install
 
 COPY frontend/ ./
+RUN npm run build
 
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+RUN npm install -g serve
+
+COPY --from=builder /app/dist ./dist
+
+ENV PORT=3000
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["sh", "-c", "serve -s dist -l ${PORT}"]
