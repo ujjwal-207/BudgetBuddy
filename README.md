@@ -13,24 +13,24 @@ A full-stack personal finance app built to answer one main question: **how do I 
 ## ✨ Features
 
 ### Core Features
-- 🛡️ **Savings-First Budgeting** - Monthly budget is based on income minus money moved into investments
-- 🎯 **Natural Language Input** - Type "200 uber yesterday" and it just works
-- ⚡ **Impulse Detection** - Smart flags for late-night or mood-based spending
-- 📊 **Visual Dashboard** - Spendable cash, protected savings, category budget map
-- 💚 **Money Health Score** - Track your financial wellness (0-100)
-- 💸 **Income to Investment Flow** - Record salary, move part to investment, and keep only the rest available for spending
-- 📈 **Return Tracking** - Investment gains/losses stay in the investment account until withdrawn
-- 🛒 **Shopping Log** - Extra fields for item name, type, longevity, mood
-- 🔄 **Recurring Expenses** - Track subscriptions and regular payments
-- 📈 **Weekly Insights** - Personalized spending analysis
-- 🎨 **Dark Mode** - Easy on the eyes
+- **Savings-First Budgeting** - Monthly budget is based on income minus money moved into investments.
+- **Natural Language Input** - Text like "200 uber yesterday" is parsed into amount, category, description, and date automatically.
+- **Impulse Detection** - Flags purchases that look impulsive based on timing, location, or amount spikes.
+- **Visual Dashboard** - Shows spendable cash, protected savings, and a breakdown by category in one place.
+- **Money Health Score** - Measures overall financial wellness on a 0-100 scale.
+- **Income-to-Investment Flow** - Lets you log salary, push part to investments, and keep the rest for planned spending.
+- **Return Tracking** - Keeps investment gains/losses inside the investment bucket until you withdraw them.
+- **Shopping Log** - Tracks extra metadata such as item name, type, longevity, and mood.
+- **Recurring Expenses** - Records subscriptions and other regular commitments.
+- **Weekly Insights** - Delivers personalized spending insights and trends.
+- **Dark Mode** - Tailored styling for low-light use.
 
 ### Delight Features
-- Keyboard shortcut `N` to focus quick-add from anywhere
-- Satisfying micro-animations on expense save
-- Category emoji icons and color coding
-- Quality scoring (Smart Spend / Neutral / Watch Out)
-- Reflection prompts for past purchases
+- `N` focuses the quick-add bar so you can log expenses without leaving the keyboard.
+- Micro-animations reinforce successful saves.
+- Categories are color-coded and clearly labeled.
+- Quality scoring tags expenses as Smart Spend, Neutral, or Watch Out.
+- Reflection prompts encourage revisiting past purchases thoughtfully.
 
 ## 📋 Prerequisites
 
@@ -182,25 +182,25 @@ GET    /recurring/summary/monthly - Monthly commitment total
 - **reflections** - User reflections on past purchases
 
 ### Seed Categories
-| Name | Icon | Budget |
-|------|------|--------|
-| Food | 🍔 | $5,000 |
-| Transport | 🚗 | $2,000 |
-| Entertainment | 🎬 | $1,500 |
-| Health | 💊 | $2,000 |
-| Shopping | 🛒 | $3,000 |
-| Bills | 🏠 | $8,000 |
-| Other | 💸 | $1,000 |
+| Name | Budget |
+|------|--------|
+| Food | $5,000 |
+| Transport | $2,000 |
+| Entertainment | $1,500 |
+| Health | $2,000 |
+| Shopping | $3,000 |
+| Bills | $8,000 |
+| Other | $1,000 |
 
 ## 💡 Natural Language Parser
 
 The parser understands inputs like:
 
 ```
-"200 uber"           → $200, Transport, "uber", today
-"coffee 80"          → $80, Food, "coffee", today
-"500 food yesterday" → $500, Food, "yesterday"
-"lunch 1200 monday"  → $1,200, Food, "lunch", last Monday
+"200 uber"           -> $200, Transport, "uber", today
+"coffee 80"          -> $80, Food, "coffee", today
+"500 food yesterday" -> $500, Food, "yesterday"
+"lunch 1200 monday"  -> $1,200, Food, "lunch", last Monday
 ```
 
 **Category Keywords:**
