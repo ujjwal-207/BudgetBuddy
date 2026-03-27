@@ -2,7 +2,7 @@
 
 A full-stack personal finance app built to answer one main question: **how do I save more money this month?** It still makes expense entry fast, but the main flow now pushes income into a monthly saving plan, investment moves, and a real spendable budget.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: React (TypeScript) + Vite + Tailwind CSS
 - **Backend**: Express (TypeScript) + PostgreSQL
@@ -10,7 +10,7 @@ A full-stack personal finance app built to answer one main question: **how do I 
 - **State Management**: Zustand
 - **Charts**: Recharts
 
-## ✨ Features
+## Features
 
 ### Core Features
 - **Savings-First Budgeting** - Monthly budget is based on income minus money moved into investments.
@@ -32,13 +32,13 @@ A full-stack personal finance app built to answer one main question: **how do I 
 - Quality scoring tags expenses as Smart Spend, Neutral, or Watch Out.
 - Reflection prompts encourage revisiting past purchases thoughtfully.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+ 
 - Docker & Docker Compose (optional, for easy setup)
 - OR PostgreSQL 15+ installed locally
 
-## 🛠️ Setup
+## Setup
 
 ### Fast Start
 
@@ -117,13 +117,13 @@ npm run dev
 
 Frontend runs on `http://localhost:3000`
 
-## 🚢 Deployment tips
+## Deployment tips
 
 - **Backend**: point `DATABASE_URL` to your managed Postgres (Railway, Supabase, etc.). The app already reads `DATABASE_URL`, `PGHOST`, `PGUSER`, and the other standard Postgres env vars, so just configure them in your cloud provider before starting the Docker image or Node process.
-- **Frontend**: when building for production, set `VITE_API_URL` to the deployed backend URL (for example `https://alluring-renewal-production-df8c.up.railway.app`). When you run `npm run build`, Vite will bake that address into the static assets while local development continues to talk to `http://localhost:4000`. If you need the dev server to accept traffic proxied from another hostname (a tunnel URL or preview host), set `VITE_ALLOWED_HOSTS` to a comma-separated list of hostnames so Vite’s dev server allows those requests.
+- **Frontend**: when building for production, set `VITE_API_URL` to the deployed backend URL (for example `https://alluring-renewal-production-df8c.up.railway.app`). When you run `npm run build`, Vite will bake that address into the static assets while local development continues to talk to `http://localhost:4000`. If you need the dev server to accept traffic proxied from another hostname (a tunnel URL or preview host), set `VITE_ALLOWED_HOSTS` to a comma-separated list of hostnames so Vite's dev server allows those requests.
 - **Local vs deployed**: keep using `./start-app.sh` for localhost (it already defaults the frontend to `http://localhost:4000`). In deployment environments use the same repo, but override `VITE_API_URL` and `DATABASE_URL` so the services target the hosted backend and database.
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Expenses
 ```
@@ -173,7 +173,7 @@ DELETE /recurring/:id           - Delete recurring expense
 GET    /recurring/summary/monthly - Monthly commitment total
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Tables
 - **categories** - Expense categories with icons, colors, budgets
@@ -192,7 +192,7 @@ GET    /recurring/summary/monthly - Monthly commitment total
 | Bills | $8,000 |
 | Other | $1,000 |
 
-## 💡 Natural Language Parser
+## Natural Language Parser
 
 The parser understands inputs like:
 
@@ -211,7 +211,7 @@ The parser understands inputs like:
 - Shopping: amazon, flipkart, shoes, clothes, bag, headphone
 - Bills: rent, electricity, wifi, bill, recharge
 
-## 🎯 Money Health Score
+## Money Health Score
 
 Score out of 100, calculated from:
 - +30 pts: % of good/investment expenses
@@ -222,12 +222,12 @@ Score out of 100, calculated from:
 - +15 pts: spending trending down
 
 **Grades:**
-- 80-100: 💚 Excellent - "You're crushing it!"
-- 60-79: 🟢 Good - "Solid habits, room to grow"
-- 40-59: 🟡 Fair - "Watch your impulse spending"
-- 0-39: 🔴 At Risk - "Time for a spending audit"
+- 80-100:  Excellent - "You're crushing it!"
+- 60-79:  Good - "Solid habits, room to grow"
+- 40-59:  Fair - "Watch your impulse spending"
+- 0-39:  At Risk - "Time for a spending audit"
 
-## ⚡ Impulse Detection
+## Impulse Detection
 
 Flags expenses as impulse if:
 - Added between 10pm - 2am
@@ -235,13 +235,13 @@ Flags expenses as impulse if:
 - Amount > 2x user's average for that category
 - User tagged mood as "Bored" or "Stressed"
 
-## 📱 Keyboard Shortcuts
+## Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
 | `N` | Focus QuickAdd bar |
 
-## 🔧 Development
+## Development
 
 ### Backend Commands
 ```bash
@@ -258,32 +258,32 @@ npm run build    # Build for production
 npm run preview  # Preview production build
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 personalfinance/
-├── backend/
-│   ├── src/
-│   │   ├── routes/          # API route handlers
-│   │   ├── db/              # Database connection & migrations
-│   │   ├── utils/           # Parser, scorer, impulse detector
-│   │   └── index.ts         # Express app entry
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Route pages
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── store/           # Zustand state management
-│   │   └── App.tsx          # Main app component
-│   ├── package.json
-│   └── vite.config.ts
-├── docker-compose.yml
-└── README.md
+ backend/
+    src/
+       routes/          # API route handlers
+       db/              # Database connection & migrations
+       utils/           # Parser, scorer, impulse detector
+       index.ts         # Express app entry
+    package.json
+    tsconfig.json
+ frontend/
+    src/
+       components/      # Reusable UI components
+       pages/           # Route pages
+       hooks/           # Custom React hooks
+       store/           # Zustand state management
+       App.tsx          # Main app component
+    package.json
+    vite.config.ts
+ docker-compose.yml
+ README.md
 ```
 
-## 🎨 UI Components
+## UI Components
 
 - **QuickAddBar** - Natural language input with live preview
 - **ExpenseCard** - Expense display with quality badges
@@ -296,7 +296,7 @@ personalfinance/
 - **ImpulseWarningModal** - Impulse purchase warning
 - **ReflectionPrompt** - Post-purchase reflection
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Port already in use:**
 ```bash
@@ -322,14 +322,14 @@ docker-compose up -d db
 npm run migrate
 ```
 
-## 📝 License
+## License
 
 MIT
 
-## 🙏 Credits
+## Credits
 
-Built with ❤️ using React, Express, and PostgreSQL.
+Built with React, Express, and PostgreSQL.
 
 ---
 
-**Start tracking your expenses today and gain financial self-awareness!** 🚀
+**Start tracking your expenses today and gain financial self-awareness!**
