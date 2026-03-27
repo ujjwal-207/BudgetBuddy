@@ -17,7 +17,6 @@ RUN npm install -g serve
 COPY --from=builder /app/dist ./dist
 
 ENV HOST=0.0.0.0
-ENV PORT=8080
 EXPOSE 8080
 
-CMD ["sh", "-c", "serve -s dist -l tcp://${HOST}:${PORT}"]
+CMD ["sh", "-c", "serve -s dist -l tcp://${HOST}:${PORT:-8080}"]
