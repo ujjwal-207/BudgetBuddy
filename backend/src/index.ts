@@ -13,6 +13,7 @@ import investmentsRouter from './routes/investments';
 import transfersRouter from './routes/transfers';
 import budgetsRouter from './routes/budgets';
 import accountsRouter from './routes/accounts';
+import loansRouter from './routes/loans';
 import { requireAuth } from './auth';
 import { ensureSchema } from './db/schema';
 
@@ -39,6 +40,7 @@ app.use('/investments', investmentsRouter);
 app.use('/transfers', transfersRouter);
 app.use('/budgets', budgetsRouter);
 app.use('/accounts', accountsRouter);
+app.use('/loans', loansRouter);
 
 // Health check
 app.get('/health', (req, res) => {

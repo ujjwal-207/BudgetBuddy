@@ -90,6 +90,24 @@ export interface Account {
   created_at: string;
 }
 
+export interface Loan {
+  id: number;
+  account_id: number | null;
+  account_name?: string | null;
+  account_icon?: string | null;
+  principal_amount: number;
+  repaid_amount: number;
+  outstanding_amount: number;
+  status: string;
+  counterparty_name: string;
+  direction: 'incoming' | 'outgoing';
+  description: string | null;
+  lent_date: string;
+  expected_repayment_date: string | null;
+  closed_at: string | null;
+  created_at: string;
+}
+
 export interface DashboardData {
   category_summary: any[];
   daily_spending: any[];
@@ -123,6 +141,7 @@ interface ExpenseState {
   income: Income[];
   investments: Investment[];
   transfers: Transfer[];
+  loans: Loan[];
   dashboard: DashboardData | null;
   insights: Insight[];
   loading: boolean;
@@ -149,6 +168,11 @@ interface ExpenseState {
   // Transfer Actions
   fetchTransfers: (month?: string) => Promise<void>;
   addTransfer: (transfer: Partial<Transfer>) => Promise<Transfer>;
+
+  // Loan Actions
+  fetchLoans: () => Promise<void>;
+  addLoan: (loan: Partial<Loan>) => Promise<Loan>;
+  repayLoan: (id: number, repayment: { amount: number; account_id?: number | null; repayment_date?: string }) => Promise<Loan>;
   
   // Common Actions
   fetchCategories: (month?: string) => Promise<void>;
@@ -165,6 +189,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   income: [],
   investments: [],
   transfers: [],
+  loans: [],
   dashboard: null,
   insights: [],
   loading: false,
@@ -391,6 +416,47 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
       }));
       get().fetchInvestments();
       get().fetchDashboard();
+      get().fetchAccounts();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  fetchLoans: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/loans`);
+      set({ loans: response.data });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  addLoan: async (loan) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/loans`, loan);
+      set((state) => ({
+        loans: [response.data, ...state.loans],
+        loading: false
+      }));
+      get().fetchAccounts();
+      return response.data;
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
+  repayLoan: async (id, repayment) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/loans/${id}/repay`, repayment);
+      set((state) => ({
+        loans: state.loans.map((loan) => (loan.id === id ? response.data : loan)),
+        loading: false
+      }));
       get().fetchAccounts();
       return response.data;
     } catch (error: any) {

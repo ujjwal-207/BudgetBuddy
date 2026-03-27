@@ -18,6 +18,7 @@ const investments_1 = __importDefault(require("./routes/investments"));
 const transfers_1 = __importDefault(require("./routes/transfers"));
 const budgets_1 = __importDefault(require("./routes/budgets"));
 const accounts_1 = __importDefault(require("./routes/accounts"));
+const loans_1 = __importDefault(require("./routes/loans"));
 const auth_2 = require("./auth");
 const schema_1 = require("./db/schema");
 dotenv_1.default.config();
@@ -40,6 +41,7 @@ app.use('/investments', investments_1.default);
 app.use('/transfers', transfers_1.default);
 app.use('/budgets', budgets_1.default);
 app.use('/accounts', accounts_1.default);
+app.use('/loans', loans_1.default);
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

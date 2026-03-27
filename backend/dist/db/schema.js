@@ -229,6 +229,83 @@ const ensureSchema = async (seedDefaults = false) => {
       )
     `);
         await client.query(`
+      CREATE TABLE IF NOT EXISTS loans (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+        account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+        counterparty_name VARCHAR(120) NOT NULL,
+        principal_amount NUMERIC(12,2) NOT NULL,
+        repaid_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+        status VARCHAR(20) NOT NULL DEFAULT 'open',
+        direction VARCHAR(20) NOT NULL DEFAULT 'outgoing',
+        description TEXT,
+        lent_date TIMESTAMPTZ DEFAULT NOW(),
+        expected_repayment_date DATE,
+        closed_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+        await client.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_name = 'loans'
+            AND column_name = 'borrower_name'
+        ) AND NOT EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_name = 'loans'
+            AND column_name = 'counterparty_name'
+        ) THEN
+          ALTER TABLE loans
+          RENAME COLUMN borrower_name TO counterparty_name;
+        END IF;
+      END
+      $$;
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS account_id INT REFERENCES accounts(id) ON DELETE SET NULL
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS counterparty_name VARCHAR(120) NOT NULL DEFAULT ''
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ALTER COLUMN counterparty_name SET NOT NULL
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS repaid_amount NUMERIC(12,2) NOT NULL DEFAULT 0
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'open'
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS direction VARCHAR(20) NOT NULL DEFAULT 'outgoing'
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ALTER COLUMN direction SET NOT NULL
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS expected_repayment_date DATE
+    `);
+        await client.query(`
+      ALTER TABLE loans
+      ADD COLUMN IF NOT EXISTS closed_at TIMESTAMPTZ
+    `);
+        await client.query(`
       ALTER TABLE transfers
       ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id) ON DELETE CASCADE
     `);
@@ -346,6 +423,7 @@ const ensureSchema = async (seedDefaults = false) => {
         await client.query(`UPDATE income SET user_id = $1 WHERE user_id IS NULL`, [adminUserId]);
         await client.query(`UPDATE investments SET user_id = $1 WHERE user_id IS NULL`, [adminUserId]);
         await client.query(`UPDATE transfers SET user_id = $1 WHERE user_id IS NULL`, [adminUserId]);
+        await client.query(`UPDATE loans SET user_id = $1 WHERE user_id IS NULL`, [adminUserId]);
         await client.query(`
       UPDATE investments
       SET current_value = invested_amount
