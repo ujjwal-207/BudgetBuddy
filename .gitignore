@@ -2,3 +2,9 @@ prompt.txt
 prompt2.txt
 .env
 /.qwen
+node_modules/
+dist/
+frontend/node_modules/
+frontend/dist/
+backend/node_modules/
+backend/dist/
