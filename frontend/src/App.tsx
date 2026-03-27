@@ -36,7 +36,7 @@ function Navigation({ user, onLogout }: { user: { username: string; role: string
 
   const navItems = [
     { path: '/', label: 'Overview', icon: '◎' },
-    { path: '/money-map', label: 'Flow', icon: '⋯' },
+    { path: '/history', label: 'Records', icon: '⋮' },
     { path: '/accounts', label: 'Accounts', icon: '▣' },
     { path: '/income', label: 'Cashflow', icon: '↗' },
     { path: '/budgets', label: 'Budget', icon: '◌' },
@@ -44,16 +44,16 @@ function Navigation({ user, onLogout }: { user: { username: string; role: string
   ];
 
   return (
-    <nav className="fixed bottom-4 left-0 right-0 z-40 px-3">
-      <div className="panel relative mx-auto max-w-5xl rounded-[2rem] px-3 py-3">
-        <div className="flex items-center justify-between gap-1">
+    <nav className="fixed bottom-3 left-0 right-0 z-40 px-2 sm:bottom-4 sm:px-3">
+      <div className="panel relative mx-auto max-w-5xl overflow-x-auto rounded-[2rem] px-2 py-2 sm:px-3 sm:py-3">
+        <div className="flex min-w-max items-center gap-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex min-w-[4.5rem] flex-col items-center rounded-2xl px-3 py-2 transition-all duration-300 ${
+                className={`relative flex min-w-[4.2rem] flex-col items-center rounded-2xl px-2 py-2 transition-all duration-300 sm:min-w-[4.5rem] sm:px-3 ${
                   isActive
                     ? 'text-slate-950 dark:text-white'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
@@ -63,7 +63,7 @@ function Navigation({ user, onLogout }: { user: { username: string; role: string
                   <div className="absolute inset-0 -z-10 rounded-2xl bg-slate-200 dark:bg-slate-800" />
                 )}
                 <span className="text-xl font-black">{item.icon}</span>
-                <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
+                <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.15em] sm:text-[11px] sm:tracking-[0.18em]">
                   {item.label}
                 </span>
               </Link>
@@ -72,13 +72,13 @@ function Navigation({ user, onLogout }: { user: { username: string; role: string
 
           <button
             onClick={toggleDark}
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-700 transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 sm:p-3 sm:text-base"
           >
             {isDark ? 'Sun' : 'Moon'}
           </button>
           <button
             onClick={onLogout}
-            className="rounded-2xl border border-slate-200 px-3 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700 dark:border-white/10 dark:text-slate-300"
+            className="rounded-2xl border border-slate-200 px-2 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-700 dark:border-white/10 dark:text-slate-300 sm:px-3 sm:py-3 sm:text-xs sm:tracking-[0.18em]"
           >
             {user.username}
           </button>

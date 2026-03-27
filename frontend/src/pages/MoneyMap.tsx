@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useExpenseStore } from '../store/expenseStore';
+import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -45,6 +47,19 @@ export function MoneyMap() {
       { income: 0, invested: 0, withdrawn: 0, spent: 0 }
     );
   }, [data.monthly_summary]);
+  const trendData = useMemo(
+    () =>
+      data.monthly_summary
+        .slice()
+        .reverse()
+        .map((month) => ({
+          month: new Date(month.month).toLocaleDateString('en-US', { month: 'short' }),
+          balance: Number(month.month_balance),
+          income: Number(month.total_income),
+          spent: Number(month.total_spent)
+        })),
+    [data.monthly_summary]
+  );
 
   return (
     <div className="min-h-screen pb-28">
@@ -90,6 +105,45 @@ export function MoneyMap() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Trend chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Month balance trend</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="month" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                  <Line type="monotone" dataKey="balance" stroke={chartTheme.colors.emerald} strokeWidth={3} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Flow chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Income vs spending by month</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={trendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="month" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                  <Bar dataKey="income" fill={chartTheme.colors.cyan} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="spent" fill={chartTheme.colors.rose} radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </section>
 

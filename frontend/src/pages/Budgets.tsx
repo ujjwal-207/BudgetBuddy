@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useExpenseStore } from '../store/expenseStore';
 import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/month';
 import { getNepalBudgetGuidance, NEPAL_MINIMUM_MONTHLY_WAGE } from '../utils/budgetGuidance';
+import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -36,6 +38,34 @@ export function Budgets() {
   const totalIncome = Number(budgetSummary?.total_income || 0);
   const availableBudget = Number(budgetSummary?.available_budget || 0);
   const guidance = getNepalBudgetGuidance(totalIncome || availableBudget || NEPAL_MINIMUM_MONTHLY_WAGE);
+  const categoryChartData = useMemo(
+    () =>
+      categories
+        .map((category) => {
+          const spent = Number(category.spent_this_month || 0);
+          const budget = Number(category.monthly_budget || 0);
+          return {
+            name: category.name,
+            budget,
+            spent,
+            fill: spent > budget && budget > 0 ? chartTheme.colors.rose : chartTheme.colors.cyan
+          };
+        })
+        .sort((a, b) => b.spent - a.spent)
+        .slice(0, 6),
+    [categories]
+  );
+  const historyChartData = useMemo(
+    () =>
+      budgetHistory
+        .slice()
+        .reverse()
+        .map((item) => ({
+          month: new Date(item.month).toLocaleDateString('en-US', { month: 'short' }),
+          delta: Number(item.surplus_or_deficit || 0)
+        })),
+    [budgetHistory]
+  );
 
   const handleDistribute = async () => {
     await axios.post(`${API_URL}/budgets/distribute`, {
@@ -160,6 +190,55 @@ export function Budgets() {
                 No monthly history yet.
               </div>
             )}
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Category chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Top category spending vs budget</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryChartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="name" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip
+                    formatter={(value: number, name: string) => [formatCurrency(value), name === 'spent' ? 'Spent' : 'Budget']}
+                    contentStyle={chartTheme.tooltipStyle}
+                  />
+                  <Bar dataKey="budget" fill={chartTheme.colors.slate} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="spent" radius={[6, 6, 0, 0]}>
+                    {categoryChartData.map((row) => (
+                      <Cell key={row.name} fill={row.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Trend chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Monthly surplus and deficit trend</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyChartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="month" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip
+                    formatter={(value: number) => [formatCurrency(value), 'Surplus/Deficit']}
+                    contentStyle={chartTheme.tooltipStyle}
+                  />
+                  <Line type="monotone" dataKey="delta" stroke={chartTheme.colors.amber} strokeWidth={3} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </section>
 

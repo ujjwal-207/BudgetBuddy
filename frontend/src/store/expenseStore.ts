@@ -3,6 +3,15 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
+const toMonthStart = (dateValue?: string | null) => {
+  if (!dateValue) return undefined;
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return undefined;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}-01`;
+};
+
 export interface Expense {
   id: number;
   amount: number;
@@ -217,6 +226,12 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
         expenses: [response.data, ...state.expenses],
         loading: false 
       }));
+      const expenseMonth = toMonthStart(response.data?.date);
+      if (expenseMonth) {
+        get().fetchCategories(expenseMonth);
+      } else {
+        get().fetchCategories();
+      }
       get().fetchDashboard();
       get().fetchAccounts();
       return response.data;
@@ -229,11 +244,23 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   updateExpense: async (id, expense) => {
     set({ loading: true, error: null });
     try {
+      const previousExpense = get().expenses.find((e) => e.id === id);
       const response = await axios.patch(`${API_URL}/expenses/${id}`, expense);
       set((state) => ({
         expenses: state.expenses.map((e) => (e.id === id ? response.data : e)),
         loading: false
       }));
+      const previousMonth = toMonthStart(previousExpense?.date);
+      const updatedMonth = toMonthStart(response.data?.date);
+      if (previousMonth) {
+        get().fetchCategories(previousMonth);
+      }
+      if (updatedMonth && updatedMonth !== previousMonth) {
+        get().fetchCategories(updatedMonth);
+      }
+      if (!previousMonth && !updatedMonth) {
+        get().fetchCategories();
+      }
       get().fetchDashboard();
       get().fetchAccounts();
     } catch (error: any) {
@@ -244,11 +271,18 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   deleteExpense: async (id) => {
     set({ loading: true, error: null });
     try {
+      const deletedExpense = get().expenses.find((e) => e.id === id);
       await axios.delete(`${API_URL}/expenses/${id}`);
       set((state) => ({
         expenses: state.expenses.filter((e) => e.id !== id),
         loading: false
       }));
+      const deletedMonth = toMonthStart(deletedExpense?.date);
+      if (deletedMonth) {
+        get().fetchCategories(deletedMonth);
+      } else {
+        get().fetchCategories();
+      }
       get().fetchDashboard();
       get().fetchAccounts();
     } catch (error: any) {

@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { QuickAddBar } from '../components/QuickAddBar';
 import { useDashboard } from '../hooks/useDashboard';
 import { useExpenseStore } from '../store/expenseStore';
 import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/month';
+import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -93,6 +95,15 @@ export function Dashboard() {
       }
     ],
     [cashflow?.available_budget, cashflow?.total_invested, totalIncome, totalInvestmentValue]
+  );
+
+  const allocationBars = useMemo(
+    () => [
+      { name: 'Spent', value: Number(dashboard?.total_spent || 0), fill: '#fb7185' },
+      { name: 'Protected', value: Number(cashflow?.total_invested || 0), fill: '#22c55e' },
+      { name: 'Remaining', value: Number(cashflow?.remaining_budget ?? cashflow?.available_budget ?? 0), fill: '#38bdf8' }
+    ],
+    [cashflow?.available_budget, cashflow?.remaining_budget, cashflow?.total_invested, dashboard?.total_spent]
   );
 
   return (
@@ -217,6 +228,30 @@ export function Dashboard() {
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
                   Category budgets allocated for {monthLabel}.
                 </p>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900/50">
+              <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
+                Spend vs save chart
+              </div>
+              <div className="mt-3 h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={allocationBars} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chartTheme.gridStroke} />
+                    <XAxis type="number" tick={chartTheme.axisTick} />
+                    <YAxis dataKey="name" type="category" tick={chartTheme.categoryTick} width={72} />
+                    <Tooltip
+                      formatter={(value: number) => [formatCurrency(value), 'Amount']}
+                      contentStyle={chartTheme.tooltipStyle}
+                    />
+                    <Bar dataKey="value" radius={[8, 8, 8, 8]}>
+                      {allocationBars.map((entry) => (
+                        <Cell key={entry.name} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
 

@@ -255,9 +255,9 @@ export function QuickAddBar({ onExpenseAdded }: QuickAddBarProps) {
 
   return (
     <>
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
+      <div className="fixed top-2 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-2 sm:top-4 sm:px-4">
         <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-center bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-600 overflow-hidden glow-primary">
+          <div className="flex flex-wrap items-center bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 dark:border-gray-600 overflow-hidden glow-primary sm:flex-nowrap">
             <div className="pl-4 text-2xl">⚡</div>
             <input
               ref={inputRef}
@@ -269,12 +269,12 @@ export function QuickAddBar({ onExpenseAdded }: QuickAddBarProps) {
               }}
               onFocus={() => setShowPreview(true)}
               placeholder="Type: '200 food', '150 uber yesterday'... (Press N to focus)"
-              className="flex-1 px-4 py-4 bg-transparent outline-none text-gray-800 dark:text-white placeholder-gray-400 text-lg"
+              className="min-w-0 flex-1 px-3 py-3 bg-transparent outline-none text-gray-800 dark:text-white placeholder-gray-400 text-base sm:px-4 sm:py-4 sm:text-lg"
             />
             <select
               value={selectedAccountId}
               onChange={(e) => setSelectedAccountId(e.target.value)}
-              className="max-w-[10rem] border-l border-gray-200 bg-white px-3 py-4 text-sm font-medium text-gray-700 outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="w-full border-t border-gray-200 bg-white px-3 py-3 text-sm font-medium text-gray-700 outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 sm:w-auto sm:max-w-[10rem] sm:border-l sm:border-t-0 sm:py-4"
             >
               {accounts.map((account) => (
                 <option key={account.id} value={account.id}>
@@ -287,7 +287,7 @@ export function QuickAddBar({ onExpenseAdded }: QuickAddBarProps) {
               type="button"
               onClick={startVoiceInput}
               disabled={isListening}
-              className={`p-3 m-1 rounded-xl transition-all ${
+              className={`p-2 sm:p-3 m-1 rounded-xl transition-all ${
                 isListening
                   ? 'bg-red-500 text-white animate-pulse'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -299,7 +299,7 @@ export function QuickAddBar({ onExpenseAdded }: QuickAddBarProps) {
             <button
               type="submit"
               disabled={!parsed || parsed.amount <= 0 || isSubmitting || (isSavingAccount && !confirmSavingSpend)}
-              className="m-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all btn-press shadow-lg"
+              className="m-2 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm sm:text-base font-bold rounded-xl transition-all btn-press shadow-lg"
             >
               {isSubmitting ? 'Adding...' : isSavingAccount ? 'Confirm spend' : 'Add'}
             </button>

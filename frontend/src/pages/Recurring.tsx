@@ -86,11 +86,11 @@ export function Recurring() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-28">
       <div className="pt-8 px-4 max-w-4xl mx-auto space-y-6 animate-slide-up">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
               🔄 Recurring Expenses
             </h1>
             <p className="text-white/80 text-sm mt-1">
@@ -99,7 +99,7 @@ export function Recurring() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition-all btn-press shadow-lg"
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 transition-all btn-press shadow-lg"
           >
             + Add Recurring
           </button>
@@ -107,14 +107,14 @@ export function Recurring() {
 
         {/* Monthly Summary */}
         {summary && (
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-purple-200 dark:border-purple-800">
+          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/20 dark:to-pink-500/20 backdrop-blur-sm rounded-3xl p-5 sm:p-8 shadow-xl border border-purple-200 dark:border-purple-800">
             <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wide flex items-center gap-2">
               <span>📊</span> Monthly Commitment
             </h2>
-            <div className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-words">
               Rs. {summary.total.toFixed(2)}
             </div>
-            <div className="grid grid-cols-3 gap-6 mt-6">
+            <div className="grid gap-4 sm:grid-cols-3 mt-6">
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4">
                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">From Daily</div>
                 <div className="text-xl font-bold text-gray-800 dark:text-white">
@@ -142,9 +142,9 @@ export function Recurring() {
           {recurring.map((item) => (
             <div
               key={item.id}
-              className="group bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-white/20 dark:border-gray-700 flex items-center justify-between card-hover"
+              className="group bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-white/20 dark:border-gray-700 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between card-hover"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 min-w-0">
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition-transform"
                   style={{ backgroundColor: `${item.category_color}25` }}
@@ -152,7 +152,7 @@ export function Recurring() {
                   {item.category_icon}
                 </div>
                 <div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Rs. {parseFloat(item.amount.toString()).toFixed(2)}
                   </div>
                   <div className="text-gray-600 dark:text-gray-300 font-medium">
@@ -169,7 +169,7 @@ export function Recurring() {
               </div>
               <button
                 onClick={() => handleDelete(item.id)}
-                className="p-3 text-red-500 hover:bg-gradient-to-r hover:from-red-100 hover:to-orange-100 dark:hover:bg-red-900/30 rounded-xl transition-all"
+                className="self-end sm:self-auto p-3 text-red-500 hover:bg-gradient-to-r hover:from-red-100 hover:to-orange-100 dark:hover:bg-red-900/30 rounded-xl transition-all"
               >
                 🗑️
               </button>
@@ -192,7 +192,7 @@ export function Recurring() {
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 w-full max-w-md shadow-2xl animate-slide-up">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-5 sm:p-8 w-full max-w-md shadow-2xl animate-slide-up">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
               <span>➕</span> Add Recurring Expense
             </h2>
@@ -255,7 +255,7 @@ export function Recurring() {
                   <option value="monthly">🗓️ Monthly</option>
                 </select>
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}

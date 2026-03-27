@@ -96,12 +96,12 @@ export function ShoppingLog() {
   const breakdown = stats?.breakdown || { necessity: 0, investment: 0, luxury: 0, impulse: 0 };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-28">
       <QuickAddBar />
       
       <div className="pt-24 px-4 max-w-6xl mx-auto space-y-6 animate-slide-up">
         <div>
-          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
             🛒 Shopping Log
           </h1>
           <p className="text-white/80 text-sm mt-1">
@@ -138,7 +138,7 @@ export function ShoppingLog() {
 
         {/* Stats Bar */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
             <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl p-5 shadow-xl border border-white/20 dark:border-gray-700">
               <div className="text-3xl mb-2">📦</div>
               <div className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -187,7 +187,7 @@ export function ShoppingLog() {
             <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wide">
               Purchase Type Breakdown
             </h3>
-            <div className="flex gap-2">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 { type: 'necessity', label: 'Necessity', color: 'green', emoji: '✅' },
                 { type: 'investment', label: 'Investment', color: 'blue', emoji: '📈' },
@@ -246,20 +246,20 @@ export function ShoppingLog() {
         {/* Shopping Items */}
         <div className="space-y-3">
           {filteredItems.map((item) => (
-            <div key={item.id} className="relative">
+            <div key={item.id} className="relative space-y-2 sm:space-y-0">
               <ExpenseCard
                 expense={item}
                 onDelete={deleteExpense}
               />
               {/* Item name badge */}
               {item.item_name && (
-                <div className="absolute top-4 right-20 text-xs px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-700 dark:text-purple-300 font-semibold">
+                <div className="text-xs px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-700 dark:text-purple-300 font-semibold sm:absolute sm:top-4 sm:right-20">
                   {item.item_name}
                 </div>
               )}
               {/* Reflection verdict badge */}
               {item.reflection_verdict && (
-                <div className={`absolute top-4 right-4 text-xs px-3 py-1.5 rounded-lg font-bold ${
+                <div className={`text-xs px-3 py-1.5 rounded-lg font-bold sm:absolute sm:top-4 sm:right-4 ${
                   item.reflection_verdict === 'worth_it'
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                     : item.reflection_verdict === 'okay'

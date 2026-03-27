@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useExpenseStore } from '../store/expenseStore';
+import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -90,6 +92,18 @@ export function Accounts() {
   const totalRepaid = useMemo(
     () => outgoingLoans.reduce((sum, loan) => sum + Number(loan.repaid_amount || 0), 0),
     [outgoingLoans]
+  );
+  const accountBalanceData = useMemo(
+    () => accounts.map((account) => ({ name: account.name, balance: Number(account.current_balance) })),
+    [accounts]
+  );
+  const loanExposurePie = useMemo(
+    () => [
+      { name: 'Outstanding lent', value: totalOutstandingLent, color: chartTheme.colors.amber },
+      { name: 'Outstanding owed', value: totalOutstandingBorrowed, color: chartTheme.colors.rose },
+      { name: 'Recovered', value: totalRepaid, color: chartTheme.colors.emerald }
+    ].filter((entry) => entry.value > 0),
+    [totalOutstandingBorrowed, totalOutstandingLent, totalRepaid]
   );
 
   const submitAccount = async (event: React.FormEvent) => {
@@ -224,6 +238,45 @@ export function Accounts() {
           <div className="standard-metric rounded-[1.25rem] p-5">
             <div className="metric-label text-xs font-semibold uppercase tracking-[0.24em]">Total borrowed</div>
             <div className="metric-value mt-4 text-3xl font-black">Rs. {totalBorrowed.toFixed(2)}</div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Balance chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Account balance comparison</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={accountBalanceData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="name" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                  <Bar dataKey="balance" fill={chartTheme.colors.cyan} radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Loan chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Loan exposure at a glance</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={loanExposurePie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                    {loanExposurePie.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </section>
 

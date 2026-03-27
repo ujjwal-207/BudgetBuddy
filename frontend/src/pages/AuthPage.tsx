@@ -33,12 +33,12 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen px-4 py-10">
-      <div className="mx-auto flex min-h-[80vh] max-w-5xl items-center">
+    <div className="min-h-screen px-4 py-6 sm:py-10">
+      <div className="mx-auto flex min-h-[80vh] max-w-5xl items-start sm:items-center">
         <div className="grid w-full gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="hero-shell rounded-[2rem] p-8">
+          <section className="hero-shell rounded-[2rem] p-5 sm:p-8">
             <div className="hero-kicker text-xs font-semibold uppercase tracking-[0.32em]">BudgetBuddy</div>
-            <h1 className="hero-title mt-4 text-5xl font-black">Know where every rupee lives.</h1>
+            <h1 className="hero-title mt-4 text-3xl sm:text-5xl font-black">Know where every rupee lives.</h1>
             <p className="hero-copy mt-4 max-w-xl text-sm">
               Track income, expenses, savings accounts, cash, wallets, investments, and monthly deficits in one place.
             </p>
@@ -49,7 +49,7 @@ export function AuthPage({ onAuthenticated }: AuthPageProps) {
             </div>
           </section>
 
-          <section className="panel rounded-[2rem] p-8">
+          <section className="panel rounded-[2rem] p-5 sm:p-8">
             <div className="flex items-center gap-2 rounded-2xl bg-slate-100 p-1 dark:bg-slate-800">
               <button
                 onClick={() => setMode('login')}

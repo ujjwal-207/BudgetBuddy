@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { useExpenseStore } from '../store/expenseStore';
 import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/month';
+import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -65,6 +67,24 @@ export function Income() {
 
     return { totalIncome, investedThisMonth, withdrawnThisMonth };
   }, [income, transfers]);
+  const flowPieData = useMemo(
+    () => [
+      { name: 'Invested', value: totals.investedThisMonth, color: chartTheme.colors.emerald },
+      { name: 'Available', value: Number(budgetSummary?.available_budget || 0), color: chartTheme.colors.cyan },
+      { name: 'Withdrawn back', value: totals.withdrawnThisMonth, color: chartTheme.colors.amber }
+    ].filter((item) => item.value > 0),
+    [budgetSummary?.available_budget, totals.investedThisMonth, totals.withdrawnThisMonth]
+  );
+  const incomeByAccount = useMemo(() => {
+    const accountTotals = new Map<string, number>();
+    income.forEach((item) => {
+      const accountName = item.account_id
+        ? accounts.find((account) => account.id === item.account_id)?.name || 'Account'
+        : 'Unassigned';
+      accountTotals.set(accountName, (accountTotals.get(accountName) || 0) + Number(item.amount));
+    });
+    return Array.from(accountTotals.entries()).map(([name, value]) => ({ name, value }));
+  }, [accounts, income]);
 
   const handleIncomeSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -159,6 +179,45 @@ export function Income() {
           ))}
         </section>
 
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Cashflow mix
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Where this month&apos;s income went</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={flowPieData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88} paddingAngle={2}>
+                    {flowPieData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="panel rounded-[2rem] p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+              Source chart
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 dark:text-white">Income by destination account</h2>
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={incomeByAccount}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.gridStroke} />
+                  <XAxis dataKey="name" tick={chartTheme.axisTick} />
+                  <YAxis tick={chartTheme.axisTick} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={chartTheme.tooltipStyle} />
+                  <Bar dataKey="value" fill={chartTheme.colors.cyan} radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr_0.9fr]">
           <form onSubmit={handleIncomeSubmit} className="panel rounded-[2rem] p-6">
             <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
@@ -170,7 +229,7 @@ export function Income() {
                 type="number"
                 step="0.01"
                 value={incomeForm.amount}
-                onChange={(event) => setIncomeForm({ ...incomeForm, amount: event.target.value })}
+                onChange={(event) => setIncomeForm((current) => ({ ...current, amount: event.target.value }))}
                 placeholder="Amount"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
@@ -178,7 +237,7 @@ export function Income() {
               <input
                 type="text"
                 value={incomeForm.source}
-                onChange={(event) => setIncomeForm({ ...incomeForm, source: event.target.value })}
+                onChange={(event) => setIncomeForm((current) => ({ ...current, source: event.target.value }))}
                 placeholder="Source"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
@@ -186,13 +245,13 @@ export function Income() {
               <input
                 type="text"
                 value={incomeForm.description}
-                onChange={(event) => setIncomeForm({ ...incomeForm, description: event.target.value })}
+                onChange={(event) => setIncomeForm((current) => ({ ...current, description: event.target.value }))}
                 placeholder="Optional note"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
               />
               <select
                 value={incomeForm.account_id}
-                onChange={(event) => setIncomeForm({ ...incomeForm, account_id: event.target.value })}
+                onChange={(event) => setIncomeForm((current) => ({ ...current, account_id: event.target.value }))}
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
               >
@@ -210,7 +269,7 @@ export function Income() {
                 <input
                   type="date"
                   value={incomeForm.received_date}
-                  onChange={(event) => setIncomeForm({ ...incomeForm, received_date: event.target.value })}
+                  onChange={(event) => setIncomeForm((current) => ({ ...current, received_date: event.target.value }))}
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                   required
                 />
@@ -219,7 +278,7 @@ export function Income() {
                 <input
                   type="checkbox"
                   checked={incomeForm.is_regular}
-                  onChange={(event) => setIncomeForm({ ...incomeForm, is_regular: event.target.checked })}
+                  onChange={(event) => setIncomeForm((current) => ({ ...current, is_regular: event.target.checked }))}
                 />
                 Mark as regular income
               </label>
@@ -239,14 +298,14 @@ export function Income() {
                 type="number"
                 step="0.01"
                 value={transferForm.amount}
-                onChange={(event) => setTransferForm({ ...transferForm, amount: event.target.value })}
+                onChange={(event) => setTransferForm((current) => ({ ...current, amount: event.target.value }))}
                 placeholder="Amount to invest"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
               />
               <select
                 value={transferForm.investment_id}
-                onChange={(event) => setTransferForm({ ...transferForm, investment_id: event.target.value })}
+                onChange={(event) => setTransferForm((current) => ({ ...current, investment_id: event.target.value }))}
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
               >
@@ -259,7 +318,7 @@ export function Income() {
               </select>
               <select
                 value={transferForm.from_account_id}
-                onChange={(event) => setTransferForm({ ...transferForm, from_account_id: event.target.value })}
+                onChange={(event) => setTransferForm((current) => ({ ...current, from_account_id: event.target.value }))}
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                 required
               >
@@ -273,7 +332,7 @@ export function Income() {
               <input
                 type="text"
                 value={transferForm.description}
-                onChange={(event) => setTransferForm({ ...transferForm, description: event.target.value })}
+                onChange={(event) => setTransferForm((current) => ({ ...current, description: event.target.value }))}
                 placeholder="Optional note"
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
               />
@@ -284,7 +343,7 @@ export function Income() {
                 <input
                   type="date"
                   value={transferForm.transfer_date}
-                  onChange={(event) => setTransferForm({ ...transferForm, transfer_date: event.target.value })}
+                  onChange={(event) => setTransferForm((current) => ({ ...current, transfer_date: event.target.value }))}
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 outline-none focus:border-cyan-400 dark:border-slate-700 dark:bg-slate-900"
                   required
                 />
