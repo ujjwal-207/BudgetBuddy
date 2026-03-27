@@ -2,8 +2,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ENV NODE_ENV=development
+ENV NPM_CONFIG_PRODUCTION=false
+
 COPY frontend/package*.json ./
-RUN npm ci --include=dev
+RUN npm ci
 
 COPY frontend/ ./
 RUN npm run build
