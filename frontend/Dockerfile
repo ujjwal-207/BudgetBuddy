@@ -6,8 +6,7 @@ ENV NODE_ENV=development
 ENV NPM_CONFIG_OMIT=
 
 COPY frontend/package*.json ./
-RUN npm install --include=dev \
- && npm ls vite
+RUN npm install --include=dev
 
 COPY frontend/ ./
 
