@@ -12,11 +12,12 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-RUN npm install -g serve
+ENV NODE_ENV=production
+
+RUN npm install -g serve@14.2.4
 
 COPY --from=builder /app/dist ./dist
 
-ENV HOST=0.0.0.0
 EXPOSE 8080
 
-CMD ["sh", "-c", "serve -s dist -l tcp://${HOST}:${PORT:-8080}"]
+CMD ["serve", "-s", "dist", "-l", "8080"]
