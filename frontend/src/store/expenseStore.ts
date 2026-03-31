@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { API_URL } from '../lib/api';
 
+const toArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? value : []);
+
 const toMonthStart = (dateValue?: string | null) => {
   if (!dateValue) return undefined;
   const date = new Date(dateValue);
@@ -211,7 +213,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
       if (filters?.category) params.append('category', filters.category);
       
       const response = await axios.get(`${API_URL}/expenses?${params}`);
-      set({ expenses: response.data, loading: false });
+      set({ expenses: toArray<Expense>(response.data), loading: false });
     } catch (error: any) {
       set({ error: error.message, loading: false });
     }
@@ -293,7 +295,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     try {
       const params = month ? `?month=${encodeURIComponent(month)}` : '';
       const response = await axios.get(`${API_URL}/categories${params}`);
-      set({ categories: response.data });
+      set({ categories: toArray<Category>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -302,7 +304,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   fetchAccounts: async () => {
     try {
       const response = await axios.get(`${API_URL}/accounts`);
-      set({ accounts: response.data });
+      set({ accounts: toArray<Account>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -320,7 +322,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   fetchInsights: async () => {
     try {
       const response = await axios.get(`${API_URL}/insights/weekly`);
-      set({ insights: response.data });
+      set({ insights: toArray<Insight>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -331,7 +333,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     try {
       const params = month ? `?month=${encodeURIComponent(month)}` : '';
       const response = await axios.get(`${API_URL}/income${params}`);
-      set({ income: response.data });
+      set({ income: toArray<Income>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -370,7 +372,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   fetchInvestments: async () => {
     try {
       const response = await axios.get(`${API_URL}/investments`);
-      set({ investments: response.data });
+      set({ investments: toArray<Investment>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -433,7 +435,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     try {
       const params = month ? `?month=${encodeURIComponent(month)}` : '';
       const response = await axios.get(`${API_URL}/transfers${params}`);
-      set({ transfers: response.data });
+      set({ transfers: toArray<Transfer>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
@@ -460,7 +462,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
   fetchLoans: async () => {
     try {
       const response = await axios.get(`${API_URL}/loans`);
-      set({ loans: response.data });
+      set({ loans: toArray<Loan>(response.data) });
     } catch (error: any) {
       set({ error: error.message });
     }
