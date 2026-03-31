@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 type AuthPageProps = {
   onAuthenticated: (payload: { token: string; user: { id: number; username: string; role: string } }) => void;

@@ -8,7 +8,7 @@ import { useExpenseStore } from '../store/expenseStore';
 import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/month';
 import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 export function Dashboard() {
   const { dashboard } = useDashboard();

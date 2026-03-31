@@ -5,7 +5,7 @@ import { ExpenseCard } from '../components/ExpenseCard';
 import { ReflectionPrompt } from '../components/ReflectionPrompt';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 interface ShoppingStats {
   total_items: number;

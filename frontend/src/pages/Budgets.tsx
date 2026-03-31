@@ -6,7 +6,7 @@ import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/mo
 import { getNepalBudgetGuidance, NEPAL_MINIMUM_MONTHLY_WAGE } from '../utils/budgetGuidance';
 import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 export function Budgets() {
   const { categories, fetchCategories } = useExpenseStore();

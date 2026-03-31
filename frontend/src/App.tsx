@@ -12,8 +12,7 @@ import { MoneyMap } from './pages/MoneyMap';
 import { Accounts } from './pages/Accounts';
 import { AuthPage } from './pages/AuthPage';
 import { useExpenseStore } from './store/expenseStore';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from './lib/api';
 
 function Navigation({ user, onLogout }: { user: { username: string; role: string }; onLogout: () => void }) {
   const location = useLocation();

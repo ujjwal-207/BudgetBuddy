@@ -10,7 +10,7 @@ import {
 } from '../store/expenseStore';
 import { formatMonthLabel, getCurrentMonthValue, toMonthDate } from '../utils/month';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 type LedgerRecord = {
   id: string;

@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Too
 import { useExpenseStore } from '../store/expenseStore';
 import { chartTheme, formatCurrency } from '../utils/chartTheme';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 type MonthlySummary = {
   month: string;

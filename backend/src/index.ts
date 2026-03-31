@@ -26,6 +26,11 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Routes
 app.use('/auth', authRouter);
 app.use(requireAuth);
@@ -41,11 +46,6 @@ app.use('/transfers', transfersRouter);
 app.use('/budgets', budgetsRouter);
 app.use('/accounts', accountsRouter);
 app.use('/loans', loansRouter);
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useExpenseStore } from '../store/expenseStore';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../lib/api';
 
 interface RecurringExpense {
   id: number;
